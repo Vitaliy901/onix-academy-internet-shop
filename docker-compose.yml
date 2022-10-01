@@ -1,0 +1,57 @@
+version: '3.9'
+
+services:
+  nginx:
+    image: nginx:1.21.4-alpine
+    volumes:
+      - ./:/var/www
+      - ./_docker/nginx/conf.d/:/etc/nginx/conf.d
+      - ./storage/logs/nginx/:/var/log/nginx
+    extra_hosts:
+      - "internet.shop:127.0.0.1"
+    ports:
+      - 80:80
+    depends_on:
+      - app
+    container_name: nginx-server
+
+  app:
+    build:
+      context: ./
+      dockerfile: _docker/app/Dockerfile
+    volumes:
+      - ./:/var/www/
+    ports:
+      - 6001:6001
+    container_name: php8
+    depends_on:
+      - pg-db
+
+  pg-db:
+    image: postgres:14.4
+    restart: always
+    user: root
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - 5432:5432
+    container_name: postgres-db
+
+  redis:
+    image: redis:7.0.4
+    container_name: redis-db
+    command: 'redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}'
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6380:6379"
+    depends_on:
+      - app
+
+volumes:
+  postgres-data:
+  redis-data:
