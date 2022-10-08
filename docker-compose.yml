@@ -44,7 +44,6 @@ services:
   redis:
     image: redis:7.0.4
     container_name: redis-db
-    command: 'redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}'
     volumes:
       - redis-data:/data
     ports:

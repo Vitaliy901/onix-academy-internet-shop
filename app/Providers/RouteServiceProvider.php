@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Http\Controllers\UserController;
+use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
@@ -28,10 +30,17 @@ class RouteServiceProvider extends ServiceProvider
     {
         $this->configureRateLimiting();
 
+        Route::bind('user', function ($value) {
+            return User::withTrashed()->where('id', $value)->firstOrFail();
+        });
+
         $this->routes(function () {
             Route::middleware('api')
                 ->prefix('api')
-                ->group(base_path('routes/api.php'));
+                ->group(function () {
+                    require_once base_path('routes/api/auth.php');
+                    require_once base_path('routes/api/api.php');
+                });
 
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));

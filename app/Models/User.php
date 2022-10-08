@@ -2,15 +2,22 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Notifications\Auth\QueuedResetPassword;
+use App\Notifications\Auth\QueuedVerifyEmail;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Contracts\Auth\CanResetPassword;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use ProtoneMedia\LaravelVerifyNewEmail\MustVerifyNewEmail;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, MustVerifyNewEmail;
 
     /**
      * The attributes that are mass assignable.
@@ -21,6 +28,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'address',
+        'device_name'
     ];
 
     /**
@@ -41,4 +50,50 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function scopeInterval(Builder $builder, $startDate, $endDate)
+    {
+        if ($startDate && $endDate) {
+            $builder->whereBetween('created_at', [
+                $startDate,
+                $endDate,
+            ]);
+        }
+    }
+
+    public function scopeSortByDesc(Builder $builder, $sortBy)
+    {
+        $builder->when($sortBy, function ($query) {
+            $query->orderByDesc('created_at');
+        });
+    }
+
+    public function scopeTrashed(Builder $builder, $deleted)
+    {
+        $builder->when($deleted, function ($query) {
+            $query->onlyTrashed();
+        });
+    }
+
+    public function isAdmin()
+    {
+        return $this->is_admin;
+    }
+
+    protected static function booted()
+    {
+        static::created(function ($user) {
+            event(new Registered($user));
+        });
+    }
+
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new QueuedVerifyEmail);
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new QueuedResetPassword($token));
+    }
 }
