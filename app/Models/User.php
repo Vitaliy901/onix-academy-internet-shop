@@ -29,6 +29,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         'email',
         'password',
         'address',
+        'phone',
         'device_name'
     ];
 
@@ -38,6 +39,8 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
      * @var array<int, string>
      */
     protected $hidden = [
+        'is_admin',
+        'deleted_at',
         'password',
         'remember_token',
     ];
@@ -50,6 +53,31 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'cart')
+            ->as('cart')
+            ->withPivot('price', 'quantity', 'total_price')
+            ->withTimestamps();
+    }
+
+    public function carts()
+    {
+        return $this->hasMany(Cart::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function scopeEmail(Builder $builder, $email)
+    {
+        return $builder->when($email, function ($query, $keywords) {
+            $query->where('email', 'ILIKE', $keywords . '%');
+        });
+    }
 
     public function scopeInterval(Builder $builder, $startDate, $endDate)
     {

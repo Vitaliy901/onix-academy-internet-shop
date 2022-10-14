@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\Products;
 
+use App\Models\Product;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateRequest extends FormRequest
@@ -13,7 +14,7 @@ class UpdateRequest extends FormRequest
      */
     public function authorize()
     {
-        return $this->user()->isAdmin();
+        return $this->user()->can('update', Product::class);
     }
 
     /**

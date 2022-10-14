@@ -22,7 +22,8 @@ class UserController extends Controller
      */
     public function index(IndexRequest $request)
     {
-        $user = User::interval($request->startDate, $request->endDate)
+        $user = User::email($request->keywords)
+            ->interval($request->startDate, $request->endDate)
             ->trashed($request->getTrashed)
             ->sortByDesc($request->sortBy)
             ->paginate($request->per_page ?? 5);

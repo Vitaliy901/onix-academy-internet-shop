@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('order_id');
             $table->integer('total_price');
-            $table->boolean('status');
+            $table->string('status', 100)->default('unpaid');
             $table->foreign('order_id')->on('orders')->references('id');
             $table->timestamps();
         });

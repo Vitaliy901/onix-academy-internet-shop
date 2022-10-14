@@ -43,7 +43,7 @@ class ProductController extends Controller
 
         $imageService->createImage($request, $product);
 
-        return $this->success(new ProductResource($product), 200, 'Product created successful!');
+        return $this->success(new ProductResource($product), 201, 'Product created successful!');
     }
 
     /**

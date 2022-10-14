@@ -24,20 +24,19 @@ class UserService
         if ($request->is('api/users/me')) {
             return $request->user();
         }
-        if ($request->user()->isAdmin()) {
+        if ($request->user()->can('itsMe', User::class)) {
             return $user;
         }
 
         throw new AccessDeniedHttpException('This action is unauthorized.');
     }
 
-
     public function optionDelete(Request $request, User $user)
     {
-        if ($request->is('api/users/me') && !$request->user()->isAdmin()) {
+        if ($request->user()->can('softDelete', $user)) {
             return $user->delete();
         }
-        if ($request->user()->isAdmin()) {
+        if ($request->user()->can('forceDelete', $user)) {
             return $user->forceDelete();
         }
 

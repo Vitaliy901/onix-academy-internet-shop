@@ -25,13 +25,6 @@ class Product extends Model
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [];
-
-    /**
      * The attributes that should be cast.
      *
      * @var array<string, string>
@@ -39,9 +32,10 @@ class Product extends Model
     protected $casts = [
         'rating' => 'float',
         'in_stock' => 'integer',
+        'price' => 'integer',
         'category_id' => 'integer',
-        'created_at' => 'datetime:Y.m.d i:m:s',
-        'updated_at' => 'datetime:Y.m.d i:m:s',
+        'created_at' => 'datetime:Y.m.d H:i:s',
+        'updated_at' => 'datetime:Y.m.d H:i:s',
     ];
 
     public function images()
@@ -52,6 +46,11 @@ class Product extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function orders()
+    {
+        return $this->belongsToMany(Order::class);
     }
 
     public function scopeCategories(Builder $builder, $category_ids)
@@ -68,7 +67,7 @@ class Product extends Model
     public function scopeRating(Builder $builder, $rating)
     {
         return $builder->when($rating, function ($query) {
-            $query->where('rating', '>', 0)->orderByDesc('rating');
+            $query->orderByDesc('rating');
         });
     }
 

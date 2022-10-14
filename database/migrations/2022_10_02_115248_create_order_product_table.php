@@ -16,9 +16,10 @@ return new class extends Migration
         Schema::create('order_product', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('order_id');
-            $table->bigInteger('product_id');
+            $table->bigInteger('product_id')->nullable();
             $table->integer('price');
             $table->integer('quantity');
+            $table->integer('total_price');
             $table->string('product_name');
             $table->string('product_image');
             $table->foreign('order_id')->on('orders')->references('id')->onDelete('cascade');

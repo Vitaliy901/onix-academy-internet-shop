@@ -16,7 +16,9 @@ class CategoryController extends Controller
     use HttpResponse;
     /**
      * Display a listing of the resource.
-     *
+     * 
+     * @param \App\Http\Resources\CategoryResource $categoryService
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request, CategoryService $categoryService)
@@ -29,14 +31,14 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \App\Http\Requests\Api\Categories\CreateRequest $request
      * @return \Illuminate\Http\Response
      */
     public function store(CreateRequest $request)
     {
         $category = Category::create($request->validated());
 
-        return $this->success(new CategoryResource($category), 200, 'Category created successful');
+        return $this->success(new CategoryResource($category), 201, 'Category created successful');
     }
 
     /**
@@ -53,8 +55,8 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \App\Http\Requests\Api\Categories\UpdateRequest $request
+     * @param \App\Models\Category $category
      * @return \Illuminate\Http\Response
      */
     public function update(UpdateRequest $request, Category $category)
@@ -67,7 +69,7 @@ class CategoryController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param \App\Models\Category $category
      * @return \Illuminate\Http\Response
      */
     public function destroy(Category $category)

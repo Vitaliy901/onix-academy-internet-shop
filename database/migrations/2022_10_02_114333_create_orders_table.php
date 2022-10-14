@@ -15,12 +15,16 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('user_id');
-            $table->boolean('status')->default(0);
+            $table->bigInteger('user_id')->nullable();
+            $table->string('status', 100)->default('open');
             $table->text('comment')->nullable();
             $table->string('address');
+            $table->integer('total_cost');
             $table->softDeletes();
-            $table->foreign('user_id')->on('users')->references('id');
+            $table->foreign('user_id')
+                ->on('users')
+                ->references('id')
+                ->onDelete('SET NULL');
             $table->timestamps();
         });
     }

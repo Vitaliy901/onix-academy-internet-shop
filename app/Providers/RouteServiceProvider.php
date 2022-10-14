@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Http\Controllers\UserController;
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
@@ -31,7 +32,15 @@ class RouteServiceProvider extends ServiceProvider
         $this->configureRateLimiting();
 
         Route::bind('user', function ($value) {
-            return User::withTrashed()->where('id', $value)->firstOrFail();
+            return User::withTrashed()->findOrFail($value);
+        });
+
+        Route::bind('order', function ($value) {
+            return Order::withTrashed()->findOrFail($value);
+        });
+
+        Route::bind('item', function ($value) {
+            return $value;
         });
 
         $this->routes(function () {
