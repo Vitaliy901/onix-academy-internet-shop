@@ -14,10 +14,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use ProtoneMedia\LaravelVerifyNewEmail\MustVerifyNewEmail;
+use Laravel\Cashier\Billable;
+use function Illuminate\Events\queueable;
 
 class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
 {
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, MustVerifyNewEmail;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, MustVerifyNewEmail, Billable;
 
     /**
      * The attributes that are mass assignable.
@@ -72,6 +74,25 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         return $this->hasMany(Order::class);
     }
 
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function questions()
+    {
+        return $this->hasMany(Question::class);
+    }
+
+    public function answers()
+    {
+        return $this->hasMany(Answer::class);
+    }
+
+    public function votes()
+    {
+        return $this->hasMany(Vote::class);
+    }
     public function scopeEmail(Builder $builder, $email)
     {
         return $builder->when($email, function ($query, $keywords) {
@@ -113,6 +134,12 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         static::created(function ($user) {
             event(new Registered($user));
         });
+
+        static::updated(queueable(function ($customer) {
+            if ($customer->hasStripeId()) {
+                $customer->syncStripeCustomerDetails();
+            }
+        }));
     }
 
     public function sendEmailVerificationNotification()

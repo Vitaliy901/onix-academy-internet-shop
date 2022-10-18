@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('images', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('product_id');
+            $table->bigInteger('product_id')->nullable();
             $table->string('filename');
             $table->foreign('product_id')
                 ->on('products')

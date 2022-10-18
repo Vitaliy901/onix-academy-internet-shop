@@ -17,8 +17,8 @@ class ImageResource extends JsonResource
         return [
             'id' => $this->id,
             'filename' => $this->filename,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'created_at' => $this->created_at->format('H:i d.m.Y'),
+            'updated_at' => $this->updated_at->format('H:i d.m.Y'),
         ];
     }
 }

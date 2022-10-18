@@ -21,9 +21,8 @@ class UserResource extends JsonResource
             'email_verified_at' => $this->email_verified_at,
             'address' => $this->address,
             'phone' => $this->phone,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-
+            'created_at' => $this->created_at->format('H:i d.m.Y'),
+            'updated_at' => $this->updated_at->format('H:i d.m.Y'),
         ];
     }
 }

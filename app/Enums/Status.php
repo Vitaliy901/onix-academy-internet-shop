@@ -11,4 +11,6 @@ enum Status: string
     case OPEN = 'open';
     case CANCELED = 'canceled';
     case CONFIRMED = 'confirmed';
+    case UP = 'up';
+    case DOWN = 'down';
 }

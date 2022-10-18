@@ -29,11 +29,16 @@ class UpdateRequest extends FormRequest
             'description'  => ['bail', 'sometimes', 'string'],
             'in_stock' => ['bail', 'sometimes', 'integer', 'between:0,200'],
             'price' => ['bail', 'sometimes', 'integer', 'min:0'],
-            'images.*'  => [
-                'bail', 'sometimes', 'file', 'max:5120', 'mimes:jpeg,gif,png',
-                /* 'dimensions:min_width=1440,min_height=1080', */
-            ],
+            'imageIds' => ['bail', 'sometimes', 'array'],
+            'imageIds.*' => ['bail', 'required_with:imageIds', 'integer', 'min:1'],
             'category_id' => ['bail', 'sometimes', 'integer', 'min:1'],
         ];
+    }
+
+    protected function prepareForValidation()
+    {
+        if ($this->imageIds === null) {
+            $this->request->remove('imageIds');
+        }
     }
 }

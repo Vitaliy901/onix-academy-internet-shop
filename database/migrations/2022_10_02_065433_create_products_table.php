@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('name');
             $table->text('description');
             $table->integer('in_stock')->default(0);
-            $table->decimal('rating', $precision = 2, $scale = 1)->default(0);
             $table->integer('price');
             $table->bigInteger('category_id')->nullable();
             $table->foreign('category_id')

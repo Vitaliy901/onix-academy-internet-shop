@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\Products;
 
+use App\Models\Product;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CreateRequest extends FormRequest
@@ -13,7 +14,7 @@ class CreateRequest extends FormRequest
      */
     public function authorize()
     {
-        return $this->user()->isAdmin();
+        return $this->user()->can('create', Product::class);
     }
 
     /**
@@ -28,11 +29,8 @@ class CreateRequest extends FormRequest
             'description'  => ['bail', 'required', 'string'],
             'in_stock' => ['bail', 'sometimes', 'integer', 'between:0,200'],
             'price' => ['bail', 'required', 'integer', 'min:0'],
-            'images' => ['bail', 'required', 'array'],
-            'images.*'  => [
-                'bail', 'required', 'file', 'max:5120', 'mimes:jpeg,gif,png',
-                /* 'dimensions:min_width=1440,min_height=1080', */
-            ],
+            'imageIds' => ['bail', 'sometimes', 'array'],
+            'imageIds.*' => ['bail', 'required_with:imageIds', 'integer', 'min:1'],
             'category_id' => ['bail', 'required', 'integer', 'min:1'],
         ];
     }
@@ -41,6 +39,9 @@ class CreateRequest extends FormRequest
     {
         if ($this->in_stock === null) {
             $this->request->remove('in_stock');
+        }
+        if ($this->imageIds === null) {
+            $this->request->remove('imageIds');
         }
     }
 }

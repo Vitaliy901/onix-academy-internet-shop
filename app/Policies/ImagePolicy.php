@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Models\Image;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
@@ -9,7 +10,48 @@ class ImagePolicy
 {
     use HandlesAuthorization;
 
-    public function delete(User $user)
+    /**
+     * Determine whether the user can view any models.
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Auth\Access\Response|bool
+     */
+    public function viewAny(User $user)
+    {
+        return true;
+    }
+
+    /**
+     * Determine whether the user can view the model.
+     *
+     * @param  \App\Models\User  $user
+     * @param  \App\Models\Image  $image
+     * @return \Illuminate\Auth\Access\Response|bool
+     */
+    public function view(User $user, Image $image)
+    {
+        return true;
+    }
+
+    /**
+     * Determine whether the user can create models.
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Auth\Access\Response|bool
+     */
+    public function create(User $user)
+    {
+        return $user->isAdmin();
+    }
+
+    /**
+     * Determine whether the user can delete the model.
+     *
+     * @param  \App\Models\User  $user
+     * @param  \App\Models\Image  $image
+     * @return \Illuminate\Auth\Access\Response|bool
+     */
+    public function delete(User $user, Image $image)
     {
         return $user->isAdmin();
     }

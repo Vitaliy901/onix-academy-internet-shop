@@ -2,26 +2,29 @@
 
 namespace App\Services;
 
-use App\Models\Product;
+use App\Models\Image;
 use Illuminate\Http\Request;
 
 class ImageService
 {
-    protected array $images = [];
+    protected array $ids = [];
 
-    public function createImage(Request $request, Product $product)
+    public function createImage(Request $request): array
     {
         if ($request->hasFile('images')) {
+
             foreach ($request->file('images') as $image) {
 
                 if ($image->isValid()) {
-                    $this->images[] = ['filename' => asset('storage/' . $image->store('images'))];
+                    $this->ids[] = Image::insertGetId([
+                        'filename' => asset('storage/' . $image->store('images')),
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
                 }
             }
 
-            $product->images()->createMany($this->images);
-
-            $product->loadMissing('images')->refresh();
+            return $this->ids;
         }
     }
 }

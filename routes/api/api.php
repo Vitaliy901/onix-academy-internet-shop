@@ -1,14 +1,19 @@
 <?php
 
+use App\Http\Controllers\Api\AnswerController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CartDeleteController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\ImageController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\OrderDeleteController;
 use App\Http\Controllers\Api\OrderItemController;
+use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProductController;
-use App\Http\Controllers\Api\ProductImageController;
+use App\Http\Controllers\Api\QuestionController;
+use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\VoteController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -22,17 +27,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Products for all
-Route::controller(ProductController::class)->group(function () {
-    Route::get('products', 'index');
-    Route::get('products/{product}', 'show');
-});
-
-// Categories for all
-Route::controller(CategoryController::class)->group(function () {
-    Route::get('categories', 'index');
-    Route::get('categories/{category}', 'show');
-});
+Route::get('reviews/{review}', [ReviewController::class, 'show'])->middleware('guest');
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -46,28 +41,57 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('users', UserController::class)->except('store');
 
     // Products
-    Route::apiResource('products', ProductController::class)->except('index', 'show');
+    Route::apiResource('products', ProductController::class);
 
-    Route::delete('products/{product}/images/{image}', ProductImageController::class)
-        ->can('delete', 'image');
-
-    /*     Route::apiResource('products.questions', ProductQuestionController::class)->except('show'); */
+    // Images
+    Route::apiResource('images', ImageController::class)->except('update');
 
     // Categories
-    Route::apiResource('categories', CategoryController::class)->except('index', 'show');
+    Route::apiResource('categories', CategoryController::class);
 
     // Cart
     Route::delete('cart', CartDeleteController::class);
 
     Route::apiResource('cart', CartController::class);
 
-    // Orders
+    // reviews for all
+    Route::controller(ReviewController::class)->group(function () {
+        Route::get('reviews', 'index');
+        Route::get('reviews/{review}', 'show');
+    });
+
+    // answers for all
+    Route::controller(AnswerController::class)->group(function () {
+        Route::get('answers', 'index');
+        Route::get('answers/{answer}', 'show');
+    });
+
+    // questions for all
+    Route::controller(QuestionController::class)->group(function () {
+        Route::get('questions', 'index');
+        Route::get('questions/{question}', 'show');
+    });
+
     Route::middleware('verified')->group(function () {
 
+        // Orders
         Route::apiResource('orders', OrderController::class);
 
         Route::delete('orders', OrderDeleteController::class);
+
         // Items of Orders
         Route::apiResource('orders.items', OrderItemController::class);
+
+        // reviews
+        Route::apiResource('reviews', ReviewController::class)->except('index', 'show');
+
+        // questions
+        Route::apiResource('questions', QuestionController::class)->except('index', 'show');
+
+        // votes 
+        Route::apiResource('votes', VoteController::class)->except('show');
+
+        // answers
+        Route::apiResource('answers', AnswerController::class)->except('index', 'show');
     });
 });

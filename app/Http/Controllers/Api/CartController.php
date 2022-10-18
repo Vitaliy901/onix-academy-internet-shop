@@ -48,7 +48,7 @@ class CartController extends Controller
 
         if ($product->in_stock != 0) {
 
-            if (!$request->user()->carts->contains('product_id', $product->id)) {
+            if ($request->user()->carts()->where('product_id', $product->id)->doesntExist()) {
                 $request->user()->products()->attach([$product->id => [
                     'quantity' => 1,
                     'price' => $product->price,

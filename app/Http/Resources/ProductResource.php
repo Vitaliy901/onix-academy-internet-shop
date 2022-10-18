@@ -22,8 +22,10 @@ class ProductResource extends JsonResource
             'rating' => $this->rating,
             'price' => $this->price,
             'category_id' => $this->category_id,
-            'created_at' => $this->created_at,
-            'updated_at' =>  $this->updated_at,
+            'questions_count' => $this->whenCounted('questions'),
+            'reviews_count' => $this->whenCounted('reviews'),
+            'created_at' => $this->created_at->format('H:i d.m.Y'),
+            'updated_at' =>  $this->updated_at->format('H:i d.m.Y'),
             'images' => ImageResource::collection($this->whenLoaded('images')),
         ];
     }

@@ -10,6 +10,7 @@ use App\Http\Resources\ProductResource;
 use App\Http\Traits\HttpResponse;
 use App\Models\Product;
 use App\Services\ImageService;
+use App\Services\ProductService;
 
 class ProductController extends Controller
 {
@@ -34,16 +35,16 @@ class ProductController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \App\Http\Requests\Api\Products\CreateRequest  $request
-     * @param  \App\Services\ImageService $imageService
+     * @param  \App\Services\ProductService $productService
      * @return \Illuminate\Http\Response
      */
-    public function store(CreateRequest $request, ImageService $imageService)
+    public function store(CreateRequest $request, ProductService $productService)
     {
-        $product = Product::create($request->safe()->except('images'));
+        $product = Product::create($request->safe()->except('imageIds'));
 
-        $imageService->createImage($request, $product);
+        $productService->addImages($request, $product);
 
-        return $this->success(new ProductResource($product), 201, 'Product created successful!');
+        return $this->success(new ProductResource($product->load('images')), 201, 'Product created successful!');
     }
 
     /**
@@ -62,16 +63,16 @@ class ProductController extends Controller
      *
      * @param  \App\Http\Requests\Api\Products\UpdateRequest  $request
      * @param  \App\Models\Product $request
-     * @param  \App\Services\ImageService $imageService
+     * @param  \App\Services\ProductService $productService
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateRequest $request, Product $product, ImageService $imageService)
+    public function update(UpdateRequest $request, Product $product, ProductService $productService)
     {
-        $product->update($request->safe()->except('images'));
+        $product->update($request->safe()->except('imageIds'));
 
-        $imageService->createImage($request, $product);
+        $productService->addImages($request, $product);
 
-        return $this->success(new ProductResource($product), 200, 'Product updated successful!');
+        return $this->success(new ProductResource($product->load('images')), 200, 'Product updated successful!');
     }
 
     /**

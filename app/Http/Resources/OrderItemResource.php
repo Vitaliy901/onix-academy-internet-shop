@@ -21,6 +21,8 @@ class OrderItemResource extends JsonResource
             'total_price' => $this->total_price,
             'product_name' =>  $this->product_name,
             'product_image' => $this->product_image,
+            'created_at' => $this->created_at->format('H:i d.m.Y'),
+            'updated_at' => $this->updated_at->format('H:i d.m.Y'),
         ];
     }
 }

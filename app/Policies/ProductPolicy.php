@@ -9,6 +9,11 @@ class ProductPolicy
 {
     use HandlesAuthorization;
 
+    public function create(User $user)
+    {
+        return $user->isAdmin();
+    }
+
     public function update(User $user)
     {
         return $user->isAdmin();
